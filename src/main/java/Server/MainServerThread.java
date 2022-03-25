@@ -12,10 +12,8 @@ import java.net.Socket;
 // This class extends thread and is used for establishing connections with the sever
 class MainServerThread extends Thread {
     private final int port;
-    private final Server server;
-    public MainServerThread(int port, Server server) {
+    public MainServerThread(int port) {
         this.port = port;
-        this.server = server;
     }
 
     public void run() {
@@ -26,7 +24,8 @@ class MainServerThread extends Thread {
                 Socket connection = listener.accept();
                 // Once a client establishes the connection create a new thread
                 // Devoted to communication between that client and the server
-                server.addNewConnection(new ConnectionHandler(connection, server));
+                SharedState sharedState = SharedState.getInstance();
+                sharedState.initiateMember(new ConnectionHandler(connection));
             }
         } catch (IOException exception) {
             exception.printStackTrace();

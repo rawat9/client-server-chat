@@ -11,31 +11,36 @@ import java.util.Scanner;
 // New instance is created every time new member joins the server
 class ConnectionHandler extends Thread {
     private Socket socket;
-    private Server server;
     private Scanner in;
     private PrintWriter out;
 
-    public ConnectionHandler(Socket socket, Server server) {
+    public ConnectionHandler(Socket socket) {
         this.socket = socket;
-        this.server = server;
     }
 
     public void run() {
         try {
+            // Create input stream and output stream
             in = new Scanner(socket.getInputStream());
             out = new PrintWriter(socket.getOutputStream(), true);
 
+            SharedState sharedState = SharedState.getInstance();
+
             while (true) {
+                // Send info to the client that server is waiting for the information about client
                 out.println(Headers.CLIENT_INFO_AWAITING);
+                // Accept line from the connection
                 String response = in.nextLine();
 
                 // If user sends CLIENT_INFO header
                 // Read line of code containing unique id, ip address, name of the user
                 if (response.equals(Headers.CLIENT_INFO_SENDING.toString())) {
                     String clientInfo = in.nextLine();
-                    if (server.isClientInfoValid(clientInfo)) {
+                    if (sharedState.isClientInfoValid(clientInfo)) {
+                        // If client data are valid, send header informing about that
                         out.println(Headers.CLIENT_INFO_VALID.toString());
-                        server.addMember(in.nextLine());
+
+                        sharedState.addMember(in.nextLine(), this.getId());
                     } else {
                         out.println(Headers.CLIENT_INFO_INVALID.toString());
                     }
@@ -48,7 +53,7 @@ class ConnectionHandler extends Thread {
 
                 if (response.equals(Headers.MESSAGE.toString())) {
                     response = in.nextLine();
-                    server.addMessage(response);
+                    sharedState.addMessage(response, this.getId());
                 }
             }
 
