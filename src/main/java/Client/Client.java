@@ -18,8 +18,7 @@ public class Client {
      private ObjectInputStream inputStream;
      private ObjectOutputStream outputStream;
      private SimpleDateFormat timestamp = new SimpleDateFormat("HH:mm:ss");
-     private ConnectionController connectWindow;
-     private ClientController window;
+     private CommunicationHandler ch;
 
      public Client() {
           try {
@@ -29,34 +28,25 @@ public class Client {
           }
      }
 
-//     public Client(String ID, String username, String address, int port) {
-//          this.ID = ID;
-//          this.username = username;
-//          this.address = address;
-//          this.port = port;
-//     }
-
+     public Client(String ID, String username, String address, int port) {
+          this.ID = ID;
+          this.username = username;
+          this.address = address;
+          this.port = port;
+     }
 
      public void contactServer() throws IOException {
-          try {
-               connect();
-               socket = new Socket(this.address, this.port);
-               inputStream = new ObjectInputStream(socket.getInputStream());
-               outputStream = new ObjectOutputStream(socket.getOutputStream());
-               isConnected = true;
+          connect();
+          isConnected = true;
 
-               new CommunicationHandler().start();
-
-          } catch (ConnectException e) {
-               System.err.println("Cannot connect");
-          } catch (UnknownHostException u) {
-               System.err.println("Don't know about address: " + address);
-          }
+          ch = new CommunicationHandler();
+          ch.start();
      }
 
      public void connect() {
           try {
-               connectWindow = new ConnectionController();
+               ConnectionController connectWindow = new ConnectionController();
+               connectWindow.setVisible(true);
           } catch (Exception e) {
                e.printStackTrace();
           }

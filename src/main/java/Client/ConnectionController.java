@@ -8,6 +8,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.UUID;
 
+
 public class ConnectionController extends JFrame implements ActionListener {
 
     Container contentPane = getContentPane();
@@ -119,18 +120,12 @@ public class ConnectionController extends JFrame implements ActionListener {
             String address = addressField.getText();
             String port = portField.getText();
 
-            // Set fields
-            Client client = new Client();
-            client.setID(id);
-            client.setUsername(username);
-            client.setAddress(address);
-            client.setPort(Integer.parseInt(port));
-
             /* TODO: Validations */
             if (port.equalsIgnoreCase("8081") && address.equalsIgnoreCase("127.0.0.1")) {
                 JOptionPane.showMessageDialog(this, "You are the coordinator");
+                System.out.println("working");
                 this.dispose();
-//                SwingUtilities.invokeLater(() -> new ClientController().setVisible(true));
+                SwingUtilities.invokeLater(() -> new ClientController().setVisible(true));
             } else {
                 JOptionPane.showMessageDialog(this, "No");
             }

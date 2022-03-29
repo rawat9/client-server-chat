@@ -1,34 +1,28 @@
 package Client;
 
-import javax.swing.*;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.Socket;
 
 public class CommunicationHandler extends Thread {
     private ObjectInputStream inputStream;
     private ObjectOutputStream outputStream;
     private ClientController controller;
-    private String response = "";
+    private Socket socket;
+    private char header;
 
     @Override
     public void run() {
         try {
-            JTextArea server = controller.getServer();
-            Message p;
-            while ((p = (Message) inputStream.readObject()) != null) {
-
-                if (p.getReceiverID().equals("Everyone")) {
-                    response = response + p.toString() + "\n";
-                    server.setText(response);
-                }
-
-                // TODO: 29/03/2022 UPDATE header enum 
-                else if (p.getReceiverID().equals("Update")) {
-                    response = response + p.toString() + "\n";
-                    server.setText(response);
-                }
+            socket = new Socket("127.0.0.1", 8081);
+            inputStream = new ObjectInputStream(socket.getInputStream());
+            while (true) {
+                header = inputStream.readChar();
+                System.out.println(header);
+//                if (message.equals(Headers.MESSAGE)) {
+//                    outputStream.writeObject("hi");
+//                }
             }
-
         } catch (Exception e) {
             e.printStackTrace();
         }
