@@ -1,3 +1,7 @@
+package Client;
+
+import Server.Server;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -87,26 +91,46 @@ public class ConnectionController extends JFrame implements ActionListener {
         joinButton.addActionListener(this);
     }
 
+    /**
+     * Set ID, Server IP & Port - read only
+     */
     public void setProperties() {
         String id = UUID.randomUUID().toString().substring(0, 4);
         idField.setText(id);
         idField.setBackground(Color.LIGHT_GRAY);
         idField.setEditable(false);
+
+        Server server = new Server();
+        serverAddressField.setText("127.0.0.1");
+        serverAddressField.setEditable(false);
+        serverAddressField.setBackground(Color.LIGHT_GRAY);
+
+        serverPortField.setText("8081");
+        serverPortField.setEditable(false);
+        serverPortField.setBackground(Color.LIGHT_GRAY);
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
 
-        // Coding Part of LOGIN button
         if (e.getSource() == joinButton) {
-            String name;
-            String address;
-            name = nameField.getText();
-            address = addressField.getText();
+            String id = idField.getText();
+            String username = nameField.getText();
+            String address = addressField.getText();
+            String port = portField.getText();
+
+            // Set fields
+            Client client = new Client();
+            client.setID(id);
+            client.setUsername(username);
+            client.setAddress(address);
+            client.setPort(Integer.parseInt(port));
 
             /* TODO: Validations */
-            if (name.equalsIgnoreCase("") && address.equalsIgnoreCase("")) {
-                JOptionPane.showMessageDialog(this, "Yes");
+            if (port.equalsIgnoreCase("8081") && address.equalsIgnoreCase("127.0.0.1")) {
+                JOptionPane.showMessageDialog(this, "You are the coordinator");
+                this.dispose();
+//                SwingUtilities.invokeLater(() -> new ClientController().setVisible(true));
             } else {
                 JOptionPane.showMessageDialog(this, "No");
             }

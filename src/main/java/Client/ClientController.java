@@ -1,10 +1,15 @@
+package Client;
+
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
 import java.util.Arrays;
 
 
-public class ClientController extends JFrame  {
+public class ClientController extends JFrame implements ActionListener {
     private static final int WINDOW_WIDTH = 365;
     private static final int WINDOW_HEIGHT = 460;
 
@@ -143,9 +148,15 @@ public class ClientController extends JFrame  {
         return frame;
     }
 
-    public static void main(String[] args) {
-        // Run GUI codes in the Event-Dispatching thread for thread safety
-//        new ConnectionController();
-        SwingUtilities.invokeLater(() -> new ClientController().setVisible(true));
+    public JTextArea getServer() {
+        return server;
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        Client client = new Client();
+        if (!message.getText().equals("")) {
+            client.sendMessage(message.getText(), client.getID());
+        }
     }
 }
