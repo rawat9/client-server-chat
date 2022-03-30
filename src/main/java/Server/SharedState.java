@@ -2,19 +2,18 @@ package Server;
 
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.UUID;
 import java.util.Vector;
 
 // Singleton class which is responsible for storing the state of the application
 public class SharedState {
     private static SharedState instance = null;
 
-    private Vector<String> messages;
+    private final Vector<String> messages;
     // This list is to maintain the order of the members
-    private LinkedList<UUID> membersOrder;
+    private final LinkedList<String> membersOrder;
     // This hash map is to store members.
     // Members will be accessed frequently so map is the best ds for that reason
-    private HashMap<Long, Member> membersMap;
+    private final HashMap<Long, Member> membersMap;
 
     private SharedState() {
         this.messages = new Vector<>();
@@ -36,6 +35,15 @@ public class SharedState {
         }
     }
 
+    // It sends the broadcast message to every connected member
+    // with updated list of the users
+    private void updateMembers() {
+        for (Member member: this.membersMap.values()) {
+            ConnectionHandler connection = member.getConnection();
+            connection.sendMembersList(Headers.USERS_LIST, this.membersMap.values());
+        }
+    }
+
     public static synchronized SharedState getInstance() {
         if (instance == null) {
             instance = new SharedState();
@@ -44,10 +52,13 @@ public class SharedState {
     }
 
     public void initiateMember(ConnectionHandler newConnection) {
+        newConnection.start();
         Member newMember = new Member(newConnection);
         this.membersMap.put(newConnection.getId(), newMember);
+        System.out.println("New user initiated. Now he has to provide username and uid through the stream");
     }
 
+    // It adds message to the list and broadcasts it to other users
     public synchronized void addMessage(String messageContent, long senderId) {
         this.messages.add(messageContent);
 
@@ -56,19 +67,32 @@ public class SharedState {
     }
 
     // It finalizes the process of creating the user
-    public synchronized void addMember(String clientInfo, long connectionId) {
-        // TODO: Get returns the reference right?
-        Member member = this.membersMap.get(connectionId);
+    public synchronized void addMember(String clientInfo, long threadId, String ipAddress) {
+        // Get a reference to the Member stored in the hash map
+        Member member = this.membersMap.get(threadId);
 
         // Update the member by parsed id and username
         String[] parsedClientInfo = this.parseClientInfo(clientInfo);
         member.setId(parsedClientInfo[0]);
         member.setUsername(parsedClientInfo[1]);
+        member.setIpAddress(ipAddress);
 
         // Once the user is fully created, add him to the membersOrder list
         this.membersOrder.add(member.getId());
 
-        // TODO: broadcast new array of users along with their ids
+        if (this.membersOrder.size() == 1) {
+            this.sendCoordinatorInfo(threadId);
+        }
+
+        this.updateMembers();
+    }
+
+    public synchronized void sendCoordinatorInfo(Long threadId) {
+        Member member = this.membersMap.get(threadId);
+        // Set property isCoordinator to true
+        member.setCoordinator();
+        // Send message to the user that he is now the coordinator
+        member.getConnection().sendMessage(Headers.COORDINATOR_INFO, "true");
     }
 
     // It checks whether the id is unique
@@ -77,17 +101,6 @@ public class SharedState {
     public synchronized boolean isClientInfoValid(String clientInfo) {
         String[] parsedInfo = this.parseClientInfo(clientInfo);
         return !this.membersMap.containsKey(Long.parseLong(parsedInfo[0]));
-    }
-
-    // It sends the broadcast message to every connected member
-    // with updated list of the users
-    private void updateMembers() {
-        for (Member member: this.membersMap.values()) {
-            // TODO: Get list of users and parse it's names after comma
-            String usersString = "";
-            ConnectionHandler connection = member.getConnection();
-            connection.sendMessage(Headers.USERS_LIST, usersString);
-        }
     }
 
     public void removeAllMembers() {
@@ -99,15 +112,33 @@ public class SharedState {
     }
 
     // It removes member that comes from inactive connection
-    public synchronized void removeMember(long connectionId) {
-        Member member = this.membersMap.get(connectionId);
+    public synchronized void removeMember(long threadId) {
+        Member member = this.membersMap.get(threadId);
 
-        this.membersMap.remove(connectionId);
+        // Interrupt the thread
+        member.closeConnection();
 
+        // Remove user from LinkedList if that user was there
         int toRemove = this.membersOrder.indexOf(member.getId());
         if (toRemove >= 0) {
             this.membersOrder.remove(toRemove);
         }
-    }
 
+        // If index of removed user was 0, change coordinator
+        if (toRemove == 0 && this.membersOrder.size() > 0) {
+            String userId = this.membersOrder.getFirst();
+
+            for(Member newCoordinator : this.membersMap.values()) {
+                if (newCoordinator.getId().equals(userId)) {
+                    this.sendCoordinatorInfo(newCoordinator.getConnection().getId());
+                }
+            }
+        }
+
+        // Remove member from members map
+        this.membersMap.remove(threadId);
+
+        // Send updated list of members
+        this.updateMembers();
+    }
 }

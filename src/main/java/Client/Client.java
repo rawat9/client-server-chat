@@ -15,8 +15,6 @@ public class Client {
      private Socket socket;
      private boolean isConnected = false;
      private String receiver = "Everyone";
-     private ObjectInputStream inputStream;
-     private ObjectOutputStream outputStream;
      private SimpleDateFormat timestamp = new SimpleDateFormat("HH:mm:ss");
      private CommunicationHandler ch;
 
@@ -65,11 +63,8 @@ public class Client {
 //     }
 
      public void sendMessage(String message, String receiverID) {
-          try {
-               outputStream.writeObject(new Message(this.ID, message, receiverID));
-          } catch (IOException e) {
-               e.printStackTrace();
-          }
+          Message newMessage = new Message(this.ID, message, receiverID);
+          ch.sendMessage(newMessage);
      }
 
      public void setAddress(String address) {
@@ -104,15 +99,15 @@ public class Client {
           this.port = port;
      }
 
-     public void closeConnections() {
-          try {
-               inputStream.close();
-               outputStream.close();
-               this.socket.close();
-          } catch (IOException e) {
-               e.printStackTrace();
-          }
-     }
+//     public void closeConnections() {
+//          try {
+//               inputStream.close();
+//               outputStream.close();
+//               this.socket.close();
+//          } catch (IOException e) {
+//               e.printStackTrace();
+//          }
+//     }
 
      public static void main(String[] args) {
           Client c = new Client();
