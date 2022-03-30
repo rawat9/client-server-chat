@@ -50,7 +50,7 @@ class Member {
         this.ipAddress = ipAddress;
     }
 
-    public String getIpAddress(String ipAddress) {
+    public String getIpAddress() {
         return this.ipAddress;
     }
 }
