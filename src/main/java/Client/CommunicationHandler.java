@@ -2,15 +2,11 @@ package Client;
 
 import Server.Headers;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.net.Socket;
-import java.util.Scanner;
 
 public class CommunicationHandler extends Thread {
-    private Scanner inputStream;
+    private ObjectInputStream inputStream;
     private ObjectOutputStream outputStream;
     private ClientController controller;
     private Socket socket;
@@ -19,22 +15,38 @@ public class CommunicationHandler extends Thread {
     @Override
     public void run() {
         try {
-            socket = new Socket("127.0.0.1", 8081);
+            socket = new Socket("127.0.0.1", 6666);
 
             outputStream = new ObjectOutputStream(socket.getOutputStream());
-            inputStream = new Scanner(socket.getInputStream());
+            inputStream = new ObjectInputStream(socket.getInputStream());
 
             System.out.println("Waiting for the header");
-            while (inputStream.hasNextLine()) {
-                header = inputStream.nextLine();
+            while (true) {
+                header = inputStream.readUTF();
                 System.out.println("Header: " + header);
+                // TODO: React to header accordingly
                 if (header.equals(Headers.CLIENT_INFO_AWAITING.toString())) {
-                    outputStream.writeChars(Headers.CLIENT_INFO_SENDING.toString());
+                    outputStream.writeUTF(Headers.CLIENT_INFO_SENDING.toString());
+                    outputStream.flush();
                     System.out.println("Działą!!");
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    public void sendMessage(Message message) {
+        try {
+            // Firstly send header
+            outputStream.writeUTF(Headers.MESSAGE.toString());
+            outputStream.flush();
+
+            // Then content
+            outputStream.writeObject(message);
+            outputStream.flush();
+        } catch (IOException exception) {
+            exception.printStackTrace();
         }
     }
 }

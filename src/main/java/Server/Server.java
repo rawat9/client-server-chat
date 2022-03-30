@@ -14,7 +14,7 @@ public class Server {
 
     public Server() {
         // Initialize necessary values
-        this.port = 8081;
+        this.port = 6666;
         this.ipAddress = "127.0.0.1";
         this.mainServerThread = new MainServerThread(port);
     }

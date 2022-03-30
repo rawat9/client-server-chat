@@ -63,11 +63,8 @@ public class Client {
 //     }
 
      public void sendMessage(String message, String receiverID) {
-//          try {
-//               outputStream.writeObject(new Message(this.ID, message, receiverID));
-//          } catch (IOException e) {
-//               e.printStackTrace();
-//          }
+          Message newMessage = new Message(this.ID, message, receiverID);
+          ch.sendMessage(newMessage);
      }
 
      public void setAddress(String address) {
