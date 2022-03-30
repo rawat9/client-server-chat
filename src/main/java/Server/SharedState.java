@@ -4,6 +4,7 @@ import Client.Message;
 
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Objects;
 import java.util.Vector;
 
 // Singleton class which is responsible for storing the state of the application
@@ -53,13 +54,6 @@ public class SharedState {
         return instance;
     }
 
-    public void initiateMember(ConnectionHandler newConnection) {
-        newConnection.start();
-        Member newMember = new Member(newConnection);
-        this.membersMap.put(newConnection.getId(), newMember);
-        System.out.println("New user initiated. Now he has to provide username and uid through the stream");
-    }
-
     // It adds message to the list and broadcasts it to other users
     public synchronized void addMessage(Message messageContent, long senderId) {
         this.messages.add(messageContent);
@@ -68,8 +62,11 @@ public class SharedState {
         this.broadcastMessage(messageContent, senderId);
     }
 
-    public Vector<Message> getMessages() {
-        return this.messages;
+    public void initiateMember(ConnectionHandler newConnection) {
+        newConnection.start();
+        Member newMember = new Member(newConnection);
+        this.membersMap.put(newConnection.getId(), newMember);
+        System.out.println("New user initiated. Now he has to provide username and uid through the stream");
     }
 
     // It finalizes the process of creating the user
@@ -91,22 +88,6 @@ public class SharedState {
         }
 
         this.updateMembers();
-    }
-
-    public synchronized void sendCoordinatorInfo(Long threadId) {
-        Member member = this.membersMap.get(threadId);
-        // Set property isCoordinator to true
-        member.setCoordinator();
-        // Send message to the user that he is now the coordinator
-        member.getConnection().sendCoordinatorInfo();
-    }
-
-    // It checks whether the id is unique
-    // Client info should have structure of: "uniqueId,username"
-    // This method is synchronized because it can be used by multiple Threads at the same time
-    public synchronized boolean isClientInfoValid(String clientInfo) {
-        String[] parsedInfo = this.parseClientInfo(clientInfo);
-        return !this.membersMap.containsKey(Long.parseLong(parsedInfo[0]));
     }
 
     public void removeAllMembers() {
@@ -146,5 +127,38 @@ public class SharedState {
 
         // Send updated list of members
         this.updateMembers();
+    }
+
+    public synchronized void sendCoordinatorInfo(Long threadId) {
+        Member member = this.membersMap.get(threadId);
+        // Set property isCoordinator to true
+        member.setCoordinator();
+        // Send message to the user that he is now the coordinator
+        member.getConnection().sendCoordinatorInfo();
+    }
+
+    // It checks whether the id is unique
+    // Client info should have structure of: "uniqueId,username"
+    // This method is synchronized because it can be used by multiple Threads at the same time
+    public synchronized boolean isClientInfoValid(String clientInfo) {
+        String[] parsedInfo = this.parseClientInfo(clientInfo);
+        for (String memberId : membersOrder) {
+            if (Objects.equals(memberId, parsedInfo[0])) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public Vector<Message> getMessages() {
+        return messages;
+    }
+
+    public LinkedList<String> getMembersOrder() {
+        return membersOrder;
+    }
+
+    public HashMap<Long, Member> getMembersMap() {
+        return membersMap;
     }
 }
