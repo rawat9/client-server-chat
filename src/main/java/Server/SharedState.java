@@ -1,5 +1,7 @@
 package Server;
 
+import Client.Message;
+
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Vector;
@@ -8,7 +10,7 @@ import java.util.Vector;
 public class SharedState {
     private static SharedState instance = null;
 
-    private final Vector<String> messages;
+    private final Vector<Message> messages;
     // This list is to maintain the order of the members
     private final LinkedList<String> membersOrder;
     // This hash map is to store members.
@@ -22,11 +24,11 @@ public class SharedState {
     }
 
     private String[] parseClientInfo(String clientInfo) {
-        return clientInfo.split(",");
+        return clientInfo.split(":");
     }
 
     // It broadcasts message to every member from the list apart from the sender
-    private void broadcastMessage(String messageContent, long senderId) {
+    private void broadcastMessage(Message messageContent, long senderId) {
         for (Member member : this.membersMap.values()) {
             ConnectionHandler connection = member.getConnection();
             if (connection.getId() != senderId) {
@@ -59,11 +61,15 @@ public class SharedState {
     }
 
     // It adds message to the list and broadcasts it to other users
-    public synchronized void addMessage(String messageContent, long senderId) {
+    public synchronized void addMessage(Message messageContent, long senderId) {
         this.messages.add(messageContent);
 
         // Broadcast newly added message to every other member
         this.broadcastMessage(messageContent, senderId);
+    }
+
+    public Vector<Message> getMessages() {
+        return this.messages;
     }
 
     // It finalizes the process of creating the user
@@ -92,7 +98,7 @@ public class SharedState {
         // Set property isCoordinator to true
         member.setCoordinator();
         // Send message to the user that he is now the coordinator
-        member.getConnection().sendMessage(Headers.COORDINATOR_INFO, "true");
+        member.getConnection().sendCoordinatorInfo();
     }
 
     // It checks whether the id is unique
