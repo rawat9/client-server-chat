@@ -22,8 +22,6 @@ class ConnectionHandler extends Thread {
     }
 
     public void run() {
-        // TODO: Spawn Separate thread for checking alive message
-
         try {
             // Firstly initiate connection - get info about user
             this.initiateConnection();

@@ -1,8 +1,14 @@
 package Client;
 
+import Server.User;
+
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.util.ArrayList;
 import java.awt.event.*;
 import java.util.Arrays;
 
@@ -131,32 +137,38 @@ public class ClientController extends JFrame {
     }
 
     public JFrame usersPanel() {
-        String[][] users = new String[][] {
-                {"20ab", "Pedro", "127.0.0.1", "status: active", "isCoordinator: true"},
-                {"y89c", "Anurag", "126.233.99.10", "status: active", "isCoordinator: false"},
-                {"8dp4", "James", "126.101.99.10", "status: active", "isCoordinator: false"},
-                {"02yq", "Oskar", "126.89.99.9", "status: inactive", "isCoordinator: false" },
-                {"3700", "Jazz", "101.190.99.10", "status: inactive", "isCoordinator: false"}
-        };
+        ArrayList<User> usersList = client.getActiveUsersList();
 
         JFrame frame = new JFrame();
-        DefaultMutableTreeNode user = new DefaultMutableTreeNode("Users");
+        DefaultMutableTreeNode usersNode = new DefaultMutableTreeNode("Users");
 
-        for (String[] u : users) {
-            DefaultMutableTreeNode root = new DefaultMutableTreeNode(Arrays.stream(u).toList().get(1));
-            for (String g: u) {
-                DefaultMutableTreeNode child = new DefaultMutableTreeNode(g);
-                root.add(child);
+        for (User user : usersList) {
+            DefaultMutableTreeNode root = new DefaultMutableTreeNode(user.getUsername());
+
+            DefaultMutableTreeNode userId = new DefaultMutableTreeNode("id: " + user.getID());
+            root.add(userId);
+
+            DefaultMutableTreeNode ipAddress = new DefaultMutableTreeNode("ip address: " + user.getIpAddress());
+            root.add(ipAddress);
+
+            if (user.getIsCoordinator()) {
+                DefaultMutableTreeNode isCoordinator = new DefaultMutableTreeNode("Coordinator");
+                root.add(isCoordinator);
             }
-            user.add(root);
+
+            usersNode.add(root);
         }
 
-        JTree tree = new JTree(user);
-        JScrollPane scrollPane = new JScrollPane(tree);
+        JTree usersTree = new JTree(usersNode);
+        JScrollPane scrollPane = new JScrollPane(usersTree);
         frame.add(scrollPane);
         frame.setSize(300,300);
         frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
         return frame;
+    }
+
+    public void updateUsersList() {
+//        usersTree.
     }
 
     public JTextArea getServer() {

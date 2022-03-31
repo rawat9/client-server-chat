@@ -1,5 +1,8 @@
 package Client;
 
+import Server.User;
+
+import java.util.ArrayList;
 import java.io.*;
 import java.net.ConnectException;
 import java.net.Socket;
@@ -16,6 +19,7 @@ public class Client {
      private CommunicationHandler communicationHandler;
      private ClientController window;
      private ConnectionController connectWindow;
+     private ArrayList<User> activeUsersList;
 
      public Client() {
           openConnectionGUI();
@@ -27,6 +31,7 @@ public class Client {
      }
 
      public void openChatGUI() {
+          activeUsersList = new ArrayList<>();
           window = new ClientController(this);
           window.open();
      }
@@ -83,6 +88,14 @@ public class Client {
           this.port = port;
      }
 
+     public void setActiveUsersList(ArrayList<User> activeUsersList) {
+          this.activeUsersList = activeUsersList;
+          window.updateUsersList();
+     }
+
+     public ArrayList<User> getActiveUsersList() {
+          return this.activeUsersList;
+     }
 
      public static void main(String[] args) {
           Client c = new Client();
