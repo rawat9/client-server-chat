@@ -146,7 +146,7 @@ public class ClientController extends JFrame {
         JScrollPane scrollPane = new JScrollPane(usersTree);
         frame.add(scrollPane);
         frame.setSize(300,300);
-        frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
+        frame.setDefaultCloseOperation(HIDE_ON_CLOSE);
         return frame;
     }
 
@@ -169,6 +169,7 @@ public class ClientController extends JFrame {
             DefaultMutableTreeNode ipAddress = new DefaultMutableTreeNode("ip address: " + user.getIpAddress());
             root.add(ipAddress);
 
+            System.out.println(user.getUsername() + " : " + user.getIsCoordinator());
             if (user.getIsCoordinator()) {
                 DefaultMutableTreeNode isCoordinator = new DefaultMutableTreeNode("Coordinator");
                 root.add(isCoordinator);
