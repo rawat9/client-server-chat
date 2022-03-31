@@ -6,12 +6,9 @@ import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.util.ArrayList;
 import java.awt.event.*;
-import java.util.Arrays;
 
 
 public class ClientController extends JFrame {
@@ -26,8 +23,6 @@ public class ClientController extends JFrame {
     private JButton send;
     private JTextArea server;
     private JScrollPane scrollBar;
-    private JList<String> members;
-    private JButton leave;
     private JButton users;
     private JTree usersTree;
     private Client client;
@@ -49,48 +44,36 @@ public class ClientController extends JFrame {
         topbar = new JPanel();
         topbar.setLayout(null);
 
-        // Avatar
-        JLabel avatar = new JLabel(new ImageIcon("src/main/java/assets/avatar.jpeg"));
-        avatar.setBounds(10, 10, 30, 30);
-
         // Name
         JLabel name = new JLabel(this.client.getUsername());
         name.setFont(new Font("Fura Code", Font.BOLD, 16));
-        name.setBounds(70, 3, 180, 40);
+        name.setBounds(10, 3, 200, 40);
         topbar.setBackground(Color.WHITE);
         topbar.setBounds(0, 0, 365, 50);
 
-        // Leave Button
+        // Users Button
         users = new JButton("Users");
         users.setForeground(Color.BLUE);
-        users.setBounds(230, 8, 60, 30);
+        users.setBounds(290, 8, 60, 30);
         users.addActionListener(e -> toggleUsers());
 
-        // Leave Button
-        leave = new JButton("Leave");
-        leave.setForeground(Color.RED);
-        leave.setBounds(290, 8, 60, 30);
-
-        topbar.add(avatar);
         topbar.add(name);
-        topbar.add(leave);
         topbar.add(users);
 
-        // Allocate the UI components
         server = new JTextArea();
         server.setEditable(false);
         scrollBar = new JScrollPane(server);
         scrollBar.setBounds(2, 52, 360, 300);
 
         // Label
-        JLabel to = new JLabel("To who:");
-        to.setBounds(5, 5, 50, 20);
+        JLabel to = new JLabel("Direct message to:");
+        to.setBounds(8, 5, 150, 20);
 
         // Combobox
-        toWho = new JComboBox<>();
+        toWho = new JComboBox(this.client.getActiveUsersList().toArray());
         toWho.addItem("Everyone");
         toWho.setSelectedItem("Everyone");
-        toWho.setBounds(60, 5, 120, 20);
+        toWho.setBounds(230, 5, 120, 20);
         toWho.addItemListener(e -> {
             if (e.getStateChange() == ItemEvent.SELECTED)  {
                 receiver = String.valueOf(toWho.getSelectedItem());
@@ -99,7 +82,7 @@ public class ClientController extends JFrame {
 
         // Message Field
         message = new JTextField(30); // accepts upto 10 characters
-        message.setBounds(5, 35, 280, 30);
+        message.setBounds(5, 35, 350, 30);
         message.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
@@ -109,10 +92,6 @@ public class ClientController extends JFrame {
             }
         });
 
-        // Send Button
-        send = new JButton("Send");
-        send.setBounds(290, 35, 70, 30);
-
         // Bottom Panel
         panel = new JPanel();
         panel.setLayout(null);
@@ -120,7 +99,6 @@ public class ClientController extends JFrame {
         panel.setBounds(0, 354, 365, 75);
 
         panel.add(message);
-        panel.add(send);
         panel.add(to);
         panel.add(toWho);
 
@@ -132,6 +110,7 @@ public class ClientController extends JFrame {
         setBackground(Color.WHITE);
         setLocation(300,100);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setResizable(false);
     }
 
     private void toggleUsers() {
@@ -146,7 +125,7 @@ public class ClientController extends JFrame {
         JScrollPane scrollPane = new JScrollPane(usersTree);
         frame.add(scrollPane);
         frame.setSize(300,300);
-        frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
+        frame.setDefaultCloseOperation(HIDE_ON_CLOSE);
         return frame;
     }
 
@@ -166,7 +145,7 @@ public class ClientController extends JFrame {
             DefaultMutableTreeNode userId = new DefaultMutableTreeNode("id: " + user.getID());
             root.add(userId);
 
-            DefaultMutableTreeNode ipAddress = new DefaultMutableTreeNode("ip address: " + user.getIpAddress());
+            DefaultMutableTreeNode ipAddress = new DefaultMutableTreeNode("ip_address: " + user.getIpAddress());
             root.add(ipAddress);
 
             if (user.getIsCoordinator()) {
@@ -187,7 +166,9 @@ public class ClientController extends JFrame {
     public JTextArea getServer() {
         return server;
     }
+
     public JTextField getMessage() {
         return message;
     }
+
 }

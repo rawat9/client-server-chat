@@ -50,16 +50,16 @@ public class ConnectionController extends JFrame implements ActionListener {
 
     public void setLocationAndSize() {
         // Labels
-        idLabel.setBounds(50, 100, 100, 30);
-        nameLabel.setBounds(50, 150, 100, 30);
-        serverAddressLabel.setBounds(50, 200, 100, 30);
-        serverPortLabel.setBounds(50, 250, 100, 30);
+        idLabel.setBounds(50, 70, 100, 30);
+        nameLabel.setBounds(50, 120, 100, 30);
+        serverAddressLabel.setBounds(50, 170, 100, 30);
+        serverPortLabel.setBounds(50, 220, 100, 30);
 
         // TextFields
-        idField.setBounds(150, 100, 150, 30);
-        nameField.setBounds(150, 150, 150, 30);
-        serverAddressField.setBounds(150, 200, 150, 30);
-        serverPortField.setBounds(150, 250, 150, 30);
+        idField.setBounds(150, 70, 150, 30);
+        nameField.setBounds(150, 120, 150, 30);
+        serverAddressField.setBounds(150, 170, 150, 30);
+        serverPortField.setBounds(150, 220, 150, 30);
 
         // Button
         joinButton.setBounds(70, 300, 220, 30);
@@ -113,7 +113,6 @@ public class ConnectionController extends JFrame implements ActionListener {
                 client.setPort(Integer.parseInt(port));
                 this.dispose();
                 client.establishConnection(address, Integer.parseInt(port));
-
             } else {
                 JOptionPane.showMessageDialog(this, "No");
             }

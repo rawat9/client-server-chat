@@ -67,11 +67,9 @@ public class CommunicationHandler extends Thread {
 
     public void sendMessage(Message message) {
         try {
-            // Firstly send header
             outputStream.writeUTF(Headers.MESSAGE.toString());
             outputStream.flush();
 
-            // Then content
             outputStream.writeObject(message);
             outputStream.flush();
         } catch (IOException exception) {

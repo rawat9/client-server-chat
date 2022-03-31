@@ -4,11 +4,14 @@ import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
+/**
+ * Author: Anurag
+ */
+
 public class Message implements Serializable {
     private String senderID;
     private String content;
     private String receiverID;
-    private Calendar cal;
     private String timestamp;
 
     public Message(String senderID, String content, String receiverID) {
