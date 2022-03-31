@@ -13,7 +13,7 @@ public class SharedState {
 
     private final Vector<Message> messages;
     // This list is to maintain the order of the members
-    private final LinkedList<String> membersOrder;
+    private final LinkedList<Long> membersOrder;
     // This hash map is to store members.
     // Members will be accessed frequently so map is the best ds for that reason
     private final HashMap<Long, Member> membersMap;
@@ -43,7 +43,7 @@ public class SharedState {
     private void updateMembers() {
         for (Member member: this.membersMap.values()) {
             ConnectionHandler connection = member.getConnection();
-            connection.sendMembersList(Headers.USERS_LIST, this.membersMap.values());
+            connection.sendMembersList(this.membersMap.values());
         }
     }
 
@@ -55,12 +55,12 @@ public class SharedState {
     }
 
     // It adds message to the list and broadcasts it to other users
-    public synchronized void addMessage(Message messageContent, long senderId) {
+    public synchronized void addMessage(Message messageContent, long senderThreadId) {
         System.out.println("Message received: " + messageContent.getContent());
         this.messages.add(messageContent);
 
         // Broadcast newly added message to every other member
-        this.broadcastMessage(messageContent, senderId);
+        this.broadcastMessage(messageContent, senderThreadId);
     }
 
     public void initiateMember(ConnectionHandler newConnection) {
@@ -77,12 +77,10 @@ public class SharedState {
 
         // Update the member by parsed id and username
         String[] parsedClientInfo = this.parseClientInfo(clientInfo);
-        member.setId(parsedClientInfo[0]);
-        member.setUsername(parsedClientInfo[1]);
-        member.setIpAddress(ipAddress);
+        member.assignUser(parsedClientInfo[0], parsedClientInfo[1], ipAddress);
 
         // Once the user is fully created, add him to the membersOrder list
-        this.membersOrder.add(member.getId());
+        this.membersOrder.add(threadId);
 
         if (this.membersOrder.size() == 1) {
             this.sendCoordinatorInfo(threadId);
@@ -107,20 +105,14 @@ public class SharedState {
         member.closeConnection();
 
         // Remove user from LinkedList if that user was there
-        int toRemove = this.membersOrder.indexOf(member.getId());
+        int toRemove = this.membersOrder.indexOf(threadId);
         if (toRemove >= 0) {
             this.membersOrder.remove(toRemove);
         }
 
         // If index of removed user was 0, change coordinator
         if (toRemove == 0 && this.membersOrder.size() > 0) {
-            String userId = this.membersOrder.getFirst();
-
-            for(Member newCoordinator : this.membersMap.values()) {
-                if (newCoordinator.getId().equals(userId)) {
-                    this.sendCoordinatorInfo(newCoordinator.getConnection().getId());
-                }
-            }
+            this.sendCoordinatorInfo(this.membersOrder.getFirst());
         }
 
         // Remove member from members map
@@ -133,7 +125,7 @@ public class SharedState {
     public synchronized void sendCoordinatorInfo(Long threadId) {
         Member member = this.membersMap.get(threadId);
         // Set property isCoordinator to true
-        member.setCoordinator();
+        member.getUser().setCoordinator();
         // Send message to the user that he is now the coordinator
         member.getConnection().sendCoordinatorInfo();
     }
@@ -143,8 +135,9 @@ public class SharedState {
     // This method is synchronized because it can be used by multiple Threads at the same time
     public synchronized boolean isClientInfoValid(String clientInfo) {
         String[] parsedInfo = this.parseClientInfo(clientInfo);
-        for (String memberId : membersOrder) {
-            if (Objects.equals(memberId, parsedInfo[0])) {
+        for (long threadId : membersOrder) {
+            User user = membersMap.get(threadId).getUser();
+            if (Objects.equals(user.getID(), parsedInfo[0])) {
                 return false;
             }
         }
@@ -155,7 +148,7 @@ public class SharedState {
         return messages;
     }
 
-    public LinkedList<String> getMembersOrder() {
+    public LinkedList<Long> getMembersOrder() {
         return membersOrder;
     }
 

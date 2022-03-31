@@ -1,13 +1,17 @@
 package Server;
 
-public class User {
+import java.io.Serializable;
+
+public class User implements Serializable {
     private String ID;
     private String username;
+    private String ipAddress;
     private boolean isCoordinator;
 
-    public User(String ID, String username) {
+    public User(String ID, String username, String ipAddress) {
         this.ID = ID;
         this.username = username;
+        this.ipAddress = ipAddress;
         isCoordinator = false;
     }
 
@@ -15,16 +19,8 @@ public class User {
         return ID;
     }
 
-    public void setID(String ID) {
-        this.ID = ID;
-    }
-
     public String getUsername() {
         return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
     }
 
     public void setCoordinator() {
@@ -33,5 +29,9 @@ public class User {
 
     public boolean getIsCoordinator() {
         return isCoordinator;
+    }
+
+    public String getIpAddress() {
+        return ipAddress;
     }
 }
