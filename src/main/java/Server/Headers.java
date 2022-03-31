@@ -10,5 +10,4 @@ public enum Headers {
     USERS_LIST, // Informs the client that the next line contains list of all users connected
     INVALID_HEADER,
     COORDINATOR_INFO, // Informs Client that user is a coordinator
-    CLIENT_ALIVE, // Informs server that client is still alive and should not be removed
 }
