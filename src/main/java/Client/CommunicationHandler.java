@@ -8,30 +8,25 @@ import java.net.Socket;
 public class CommunicationHandler extends Thread {
     private ObjectInputStream inputStream;
     private ObjectOutputStream outputStream;
-    private Client client;
+    private ClientController controller;
     private Socket socket;
     private String header;
-    private String userId;
-    private String username;
-    private String ipAddress;
-    private int port;
+    private Client client;
+    private Boolean isConnected = false;
 
-    CommunicationHandler(String ipAddress, int port, String userId, String username, Client client) {
-        this.ipAddress = ipAddress;
-//        this.port = port;
-        this.port = 6666;
-        this.userId = userId;
-        this.username = username;
+    CommunicationHandler(Client client) {
+        super.start();
         this.client = client;
     }
 
     @Override
     public void run() {
         try {
-            socket = new Socket(ipAddress, port);
+            socket = new Socket("127.0.0.1", 8000);
 
             outputStream = new ObjectOutputStream(socket.getOutputStream());
             inputStream = new ObjectInputStream(socket.getInputStream());
+            isConnected = true;
 
             System.out.println("Waiting for the header");
             while (true) {
@@ -41,11 +36,7 @@ public class CommunicationHandler extends Thread {
                 if (header.equals(Headers.CLIENT_INFO_AWAITING.toString())) {
                     outputStream.writeUTF(Headers.CLIENT_INFO_SENDING.toString());
                     outputStream.flush();
-
-                    outputStream.writeUTF(this.userId+":"+this.username);
-                    outputStream.flush();
-                } else if (header.equals(Headers.CLIENT_INFO_VALID.toString())) {
-                    this.client.openChatWindow();
+                    System.out.println("!!");
                 }
             }
         } catch (Exception e) {
@@ -55,7 +46,6 @@ public class CommunicationHandler extends Thread {
 
     public void sendMessage(Message message) {
         try {
-            System.out.println("sending a message");
             // Firstly send header
             outputStream.writeUTF(Headers.MESSAGE.toString());
             outputStream.flush();
@@ -66,5 +56,23 @@ public class CommunicationHandler extends Thread {
         } catch (IOException exception) {
             exception.printStackTrace();
         }
+    }
+
+     public void closeConnections() {
+          try {
+               inputStream.close();
+               outputStream.close();
+               this.socket.close();
+          } catch (IOException e) {
+               e.printStackTrace();
+          }
+     }
+
+    public Boolean getConnected() {
+        return isConnected;
+    }
+
+    public void setConnected(Boolean connected) {
+        isConnected = connected;
     }
 }

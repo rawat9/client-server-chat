@@ -1,6 +1,6 @@
 package Client;
 
-import Server.User;
+import Server.Server;
 
 import javax.swing.*;
 import java.awt.*;
@@ -14,15 +14,11 @@ public class ConnectionController extends JFrame implements ActionListener {
     Container contentPane = getContentPane();
     JLabel idLabel = new JLabel("ID");
     JLabel nameLabel = new JLabel("Name");
-    JLabel addressLabel = new JLabel("IP Address");
-    JLabel portLabel = new JLabel("Port");
-    JLabel serverAddressLabel = new JLabel("Server Address");
-    JLabel serverPortLabel = new JLabel("Server Port");
+    JLabel serverAddressLabel = new JLabel("Address");
+    JLabel serverPortLabel = new JLabel("Port");
 
     JTextField idField = new JTextField();
     JTextField nameField = new JTextField();
-    JTextField addressField = new JTextField();
-    JTextField portField = new JTextField();
     JTextField serverAddressField = new JTextField();
     JTextField serverPortField = new JTextField();
 
@@ -32,7 +28,9 @@ public class ConnectionController extends JFrame implements ActionListener {
 
     ConnectionController(Client client) {
         this.client = client;
+    }
 
+    public void open() {
         setTitle("Connection");
         setVisible(true);
         setBounds(10, 10, 370, 500);
@@ -54,21 +52,17 @@ public class ConnectionController extends JFrame implements ActionListener {
         // Labels
         idLabel.setBounds(50, 100, 100, 30);
         nameLabel.setBounds(50, 150, 100, 30);
-        addressLabel.setBounds(50, 200, 100, 30);
-        portLabel.setBounds(50, 250, 100, 30);
-        serverAddressLabel.setBounds(50, 300, 100, 30);
-        serverPortLabel.setBounds(50, 350, 100, 30);
+        serverAddressLabel.setBounds(50, 200, 100, 30);
+        serverPortLabel.setBounds(50, 250, 100, 30);
 
         // TextFields
         idField.setBounds(150, 100, 150, 30);
         nameField.setBounds(150, 150, 150, 30);
-        addressField.setBounds(150, 200, 150, 30);
-        portField.setBounds(150, 250, 150, 30);
-        serverAddressField.setBounds(150, 300, 150, 30);
-        serverPortField.setBounds(150, 350, 150, 30);
+        serverAddressField.setBounds(150, 200, 150, 30);
+        serverPortField.setBounds(150, 250, 150, 30);
 
         // Button
-        joinButton.setBounds(70, 420, 220, 30);
+        joinButton.setBounds(70, 300, 220, 30);
     }
 
     /**
@@ -77,15 +71,11 @@ public class ConnectionController extends JFrame implements ActionListener {
     public void addComponentsToContainer() {
         contentPane.add(idLabel);
         contentPane.add(nameLabel);
-        contentPane.add(addressLabel);
-        contentPane.add(portLabel);
         contentPane.add(serverAddressLabel);
         contentPane.add(serverPortLabel);
 
         contentPane.add(idField);
         contentPane.add(nameField);
-        contentPane.add(addressField);
-        contentPane.add(portField);
         contentPane.add(serverAddressField);
         contentPane.add(serverPortField);
 
@@ -105,11 +95,12 @@ public class ConnectionController extends JFrame implements ActionListener {
         idField.setBackground(Color.LIGHT_GRAY);
         idField.setEditable(false);
 
+        Server server = new Server();
         serverAddressField.setText("127.0.0.1");
         serverAddressField.setEditable(false);
         serverAddressField.setBackground(Color.LIGHT_GRAY);
 
-        serverPortField.setText("8081");
+        serverPortField.setText("8000");
         serverPortField.setEditable(false);
         serverPortField.setBackground(Color.LIGHT_GRAY);
     }
@@ -120,15 +111,21 @@ public class ConnectionController extends JFrame implements ActionListener {
         if (e.getSource() == joinButton) {
             String id = idField.getText();
             String username = nameField.getText();
-            String address = addressField.getText();
-            String port = portField.getText();
+            String address = serverAddressField.getText();
+            String port = serverPortField.getText();
 
             /* TODO: Validations */
-            if (port.equalsIgnoreCase("8081") && address.equalsIgnoreCase("127.0.0.1")) {
+            if (port.equalsIgnoreCase("8000") && address.equalsIgnoreCase("127.0.0.1")) {
                 JOptionPane.showMessageDialog(this, "You are the coordinator");
+
+                client.setID(id);
+                client.setUsername(username);
+                client.setAddress(address);
+                client.setPort(Integer.parseInt(port));
                 System.out.println("working");
                 this.dispose();
-                this.client.establishServerConnection(address, Integer.parseInt(port), id, username);
+
+                client.openChat();
             } else {
                 JOptionPane.showMessageDialog(this, "No");
             }
