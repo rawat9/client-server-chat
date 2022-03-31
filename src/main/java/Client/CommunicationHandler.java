@@ -11,14 +11,22 @@ public class CommunicationHandler extends Thread {
     private ClientController controller;
     private Socket socket;
     private String header;
+    private Client client;
+    private Boolean isConnected = false;
+
+    CommunicationHandler(Client client) {
+        super.start();
+        this.client = client;
+    }
 
     @Override
     public void run() {
         try {
-            socket = new Socket("127.0.0.1", 6666);
+            socket = new Socket("127.0.0.1", 8000);
 
             outputStream = new ObjectOutputStream(socket.getOutputStream());
             inputStream = new ObjectInputStream(socket.getInputStream());
+            isConnected = true;
 
             System.out.println("Waiting for the header");
             while (true) {
@@ -28,7 +36,7 @@ public class CommunicationHandler extends Thread {
                 if (header.equals(Headers.CLIENT_INFO_AWAITING.toString())) {
                     outputStream.writeUTF(Headers.CLIENT_INFO_SENDING.toString());
                     outputStream.flush();
-                    System.out.println("Działą!!");
+                    System.out.println("!!");
                 }
             }
         } catch (Exception e) {
@@ -48,5 +56,23 @@ public class CommunicationHandler extends Thread {
         } catch (IOException exception) {
             exception.printStackTrace();
         }
+    }
+
+     public void closeConnections() {
+          try {
+               inputStream.close();
+               outputStream.close();
+               this.socket.close();
+          } catch (IOException e) {
+               e.printStackTrace();
+          }
+     }
+
+    public Boolean getConnected() {
+        return isConnected;
+    }
+
+    public void setConnected(Boolean connected) {
+        isConnected = connected;
     }
 }

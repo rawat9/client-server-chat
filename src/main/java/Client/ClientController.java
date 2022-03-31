@@ -9,7 +9,7 @@ import java.awt.event.ItemEvent;
 import java.util.Arrays;
 
 
-public class ClientController extends JFrame implements ActionListener {
+public class ClientController extends JFrame {
     private static final int WINDOW_WIDTH = 365;
     private static final int WINDOW_HEIGHT = 460;
 
@@ -24,8 +24,18 @@ public class ClientController extends JFrame implements ActionListener {
     private JList<String> members;
     private JButton leave;
     private JButton users;
+    private Client client;
 
-    public ClientController() {
+    public ClientController(Client client) {
+        this.client = client;
+        createComponents();
+    }
+
+    public void open() {
+        setVisible(true);
+    }
+
+    public void createComponents() {
         setLayout(null);
 
         // Topbar
@@ -37,7 +47,7 @@ public class ClientController extends JFrame implements ActionListener {
         avatar.setBounds(10, 10, 30, 30);
 
         // Name
-        JLabel name = new JLabel("Anurag");
+        JLabel name = new JLabel(this.client.getUsername());
         name.setFont(new Font("Fura Code", Font.BOLD, 16));
         name.setBounds(70, 3, 180, 40);
         topbar.setBackground(Color.WHITE);
@@ -150,13 +160,5 @@ public class ClientController extends JFrame implements ActionListener {
 
     public JTextArea getServer() {
         return server;
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        Client client = new Client();
-        if (!message.getText().equals("")) {
-            client.sendMessage(message.getText(), client.getID());
-        }
     }
 }

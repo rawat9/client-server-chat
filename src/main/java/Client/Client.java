@@ -17,11 +17,26 @@ public class Client {
      private String receiver = "Everyone";
      private SimpleDateFormat timestamp = new SimpleDateFormat("HH:mm:ss");
      private CommunicationHandler ch;
+     private ClientController window;
+     private ConnectionController connectWindow;
 
      public Client() {
           try {
                contactServer();
+               if (isConnected) {
+                    openChat();
+               }
           } catch (IOException e) {
+               e.printStackTrace();
+          }
+     }
+
+     public void openChat() {
+          try {
+               window = new ClientController(this);
+               ch.setConnected(true);
+               window.open();
+          } catch (Exception e) {
                e.printStackTrace();
           }
      }
@@ -35,16 +50,13 @@ public class Client {
 
      public void contactServer() throws IOException {
           connect();
-          isConnected = true;
-
-          ch = new CommunicationHandler();
-          ch.start();
+          ch = new CommunicationHandler(this);
      }
 
      public void connect() {
           try {
-               ConnectionController connectWindow = new ConnectionController();
-               connectWindow.setVisible(true);
+               connectWindow = new ConnectionController(this);
+               connectWindow.open();
           } catch (Exception e) {
                e.printStackTrace();
           }
@@ -57,10 +69,6 @@ public class Client {
      public void isCoordinator() {
 
      }
-
-//     public void terminate() {
-//          isConnected = false;
-//     }
 
      public void sendMessage(String message, String receiverID) {
           Message newMessage = new Message(this.ID, message, receiverID);
@@ -99,15 +107,6 @@ public class Client {
           this.port = port;
      }
 
-//     public void closeConnections() {
-//          try {
-//               inputStream.close();
-//               outputStream.close();
-//               this.socket.close();
-//          } catch (IOException e) {
-//               e.printStackTrace();
-//          }
-//     }
 
      public static void main(String[] args) {
           Client c = new Client();
