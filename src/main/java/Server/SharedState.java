@@ -72,7 +72,6 @@ public class SharedState {
         newConnection.start();
         Member newMember = new Member(newConnection);
         this.membersMap.put(newConnection.getId(), newMember);
-        System.out.println("New user initiated. Now he has to provide username and uid through the stream");
     }
 
     // It finalizes the process of creating the user

@@ -19,6 +19,7 @@ class MainServerThread extends Thread {
     public void run() {
         try {
             ServerSocket listener = new ServerSocket(port);
+            System.out.println("Server is running on port: " + port);
             while(true) {
                 // Wait for every client connection
                 Socket connection = listener.accept();
