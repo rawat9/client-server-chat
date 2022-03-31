@@ -1,9 +1,5 @@
 package Client;
 
-import java.io.*;
-import java.net.ConnectException;
-import java.net.Socket;
-import java.net.UnknownHostException;
 import java.text.SimpleDateFormat;
 
 
@@ -12,54 +8,27 @@ public class Client {
      private String username;
      private String address;
      private int port;
-     private Socket socket;
-     private boolean isConnected = false;
-     private String receiver = "Everyone";
-     private SimpleDateFormat timestamp = new SimpleDateFormat("HH:mm:ss");
-     private CommunicationHandler ch;
+     private CommunicationHandler communicationHandler;
      private ClientController window;
      private ConnectionController connectWindow;
 
      public Client() {
-          try {
-               contactServer();
-               if (isConnected) {
-                    openChat();
-               }
-          } catch (IOException e) {
-               e.printStackTrace();
-          }
+          // Instantiate GUI for connection and open it
+          openConnectionGUI();
      }
 
-     public void openChat() {
-          try {
-               window = new ClientController(this);
-               ch.setConnected(true);
-               window.open();
-          } catch (Exception e) {
-               e.printStackTrace();
-          }
+     public void openConnectionGUI() {
+          connectWindow = new ConnectionController(this);
+          connectWindow.open();
      }
 
-     public Client(String ID, String username, String address, int port) {
-          this.ID = ID;
-          this.username = username;
-          this.address = address;
-          this.port = port;
+     public void openChatGUI() {
+          window = new ClientController(this);
+          window.open();
      }
 
-     public void contactServer() throws IOException {
-          connect();
-          ch = new CommunicationHandler(this);
-     }
-
-     public void connect() {
-          try {
-               connectWindow = new ConnectionController(this);
-               connectWindow.open();
-          } catch (Exception e) {
-               e.printStackTrace();
-          }
+     public void establishConnection() {
+         communicationHandler = new CommunicationHandler(this);
      }
 
      public void setCoordinator() {
@@ -72,7 +41,7 @@ public class Client {
 
      public void sendMessage(String message, String receiverID) {
           Message newMessage = new Message(this.ID, message, receiverID);
-          ch.sendMessage(newMessage);
+          communicationHandler.sendMessage(newMessage);
      }
 
      public void setAddress(String address) {
@@ -106,7 +75,6 @@ public class Client {
      public void setPort(int port) {
           this.port = port;
      }
-
 
      public static void main(String[] args) {
           Client c = new Client();

@@ -5,6 +5,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Collection;
 
 // New thread that handles the communication between server and one client
@@ -13,7 +14,7 @@ class ConnectionHandler extends Thread {
     private final Socket socket;
     private ObjectInputStream in;
     private ObjectOutputStream out;
-    private SharedState sharedState;
+    private final SharedState sharedState;
 
     public ConnectionHandler(Socket socket) {
         this.socket = socket;
@@ -27,9 +28,11 @@ class ConnectionHandler extends Thread {
             // Firstly initiate connection - get info about user
             this.initiateConnection();
 
+            System.out.println("Connection initiated");
             // Receive any message
             while (!this.isInterrupted()) {
                 String header = in.readUTF();
+                System.out.println("HEADER_RECEIVED: " + header);
 
                 if (header.equals(Headers.MESSAGE.toString())) {
                     Message message = (Message) in.readObject();
@@ -69,8 +72,9 @@ class ConnectionHandler extends Thread {
                 if (sharedState.isClientInfoValid(clientInfo)) {
                     // If client data are valid, send header informing about that
                     this.sendHeader(Headers.CLIENT_INFO_VALID);
-                    sharedState.addMember(in.readUTF(), this.getId(), socket.getInetAddress().toString());
-                    break;
+                    sharedState.addMember(clientInfo, this.getId(), socket.getInetAddress().toString());
+                    System.out.println("member added");
+                    return;
                 } else {
                     this.sendHeader(Headers.CLIENT_INFO_INVALID);
                 }
@@ -105,11 +109,16 @@ class ConnectionHandler extends Thread {
         this.sendHeader(Headers.COORDINATOR_INFO);
     }
 
-    public void sendMembersList(@NotNull Headers messageHeader, Collection<Member> members) {
+    public void sendMembersList(Collection<Member> members) {
         try {
-            this.sendHeader(messageHeader);
+            this.sendHeader(Headers.USERS_LIST);
 
-            out.writeObject(members);
+            ArrayList<User> users = new ArrayList<>();
+            for (Member member : members) {
+                users.add(member.getUser());
+            }
+
+            out.writeObject(users);
             out.flush();
         } catch (IOException exception) {
             exception.printStackTrace();

@@ -57,7 +57,7 @@ class SharedStateTest {
         // and add it to the Hash map, but not to LinkedList
 
         HashMap<Long, Member> membersMap = sharedState.getMembersMap();
-        LinkedList<String> membersOrder = sharedState.getMembersOrder();
+        LinkedList<Long> membersOrder = sharedState.getMembersOrder();
 
         assertEquals(0, membersMap.size());
         assertEquals(0, membersOrder.size());
@@ -86,8 +86,8 @@ class SharedStateTest {
         sharedState.initiateMember(connectionHandler2);
         sharedState.addMember("124ab:pedro", thread2, ipAddress);
 
-        Message message = new Message("123ab", "Message", "567cd");
-        sharedState.addMessage(message, (long) 1234567);
+        Message message = new Message("123ab", "Message", "124ab");
+        sharedState.addMessage(message, (long) thread1);
 
         List<Message> messages = sharedState.getMessages();
         assertEquals(1, messages.size());
@@ -95,7 +95,7 @@ class SharedStateTest {
 
     @Test
     void addMember() {
-        LinkedList<String> membersOrder = sharedState.getMembersOrder();
+        LinkedList<Long> membersOrder = sharedState.getMembersOrder();
         HashMap<Long, Member> membersMap = sharedState.getMembersMap();
 
         // Before adding a user, membersOrder list and membersMap map should be empty
@@ -113,21 +113,21 @@ class SharedStateTest {
         membersOrder = sharedState.getMembersOrder();
         membersMap = sharedState.getMembersMap();
 
-        Member createdMember = membersMap.get(thread1);
+        User createdUser = membersMap.get(thread1).getUser();
         // Newly created member should be coordinator, because he is the first
-        assertTrue(createdMember.getCoordinator());
+        assertTrue(createdUser.getIsCoordinator());
 
         // membersMap and membersOrder should have size equal to 1
         assertEquals(1, membersMap.size());
         assertEquals(1, membersOrder.size());
 
         // Check if correct info is added to members order
-        assertEquals(userId, membersOrder.getFirst());
+        assertEquals(thread1, membersOrder.getFirst());
 
         // Check if correct info is added to members map
-        assertEquals(userId, createdMember.getId());
-        assertEquals(username, createdMember.getUsername());
-        assertEquals(ipAddress, createdMember.getIpAddress());
+        assertEquals(userId,createdUser.getID());
+        assertEquals(username, createdUser.getUsername());
+        assertEquals(ipAddress, createdUser.getIpAddress());
     }
 
     @Test
@@ -173,12 +173,12 @@ class SharedStateTest {
         sharedState.addMember("124ab:pedro", thread2, "127.0.0.1");
 
         HashMap<Long, Member> membersMap = sharedState.getMembersMap();
-        LinkedList<String> membersOrder = sharedState.getMembersOrder();
+        LinkedList<Long> membersOrder = sharedState.getMembersOrder();
 
         assertEquals(2, membersMap.size());
         assertEquals(2, membersOrder.size());
 
-        assertFalse(membersMap.get(thread2).getCoordinator());
+        assertFalse(membersMap.get(thread2).getUser().getIsCoordinator());
 
         sharedState.removeMember(thread1);
 
@@ -188,6 +188,6 @@ class SharedStateTest {
         assertEquals(1, membersMap.size());
         assertEquals(1, membersOrder.size());
 
-        assertTrue(membersMap.get(thread2).getCoordinator());
+        assertTrue(membersMap.get(thread2).getUser().getIsCoordinator());
     }
 }
