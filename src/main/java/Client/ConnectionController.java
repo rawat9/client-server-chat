@@ -33,7 +33,7 @@ public class ConnectionController extends JFrame implements ActionListener {
     public void open() {
         setTitle("Connection");
         setVisible(true);
-        setBounds(10, 10, 370, 500);
+        setBounds(10, 10, 370, 400);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setResizable(false);
 
@@ -96,13 +96,6 @@ public class ConnectionController extends JFrame implements ActionListener {
         idField.setEditable(false);
 
         Server server = new Server();
-        serverAddressField.setText("127.0.0.1");
-        serverAddressField.setEditable(false);
-        serverAddressField.setBackground(Color.LIGHT_GRAY);
-
-        serverPortField.setText("8000");
-        serverPortField.setEditable(false);
-        serverPortField.setBackground(Color.LIGHT_GRAY);
     }
 
     @Override
@@ -122,10 +115,9 @@ public class ConnectionController extends JFrame implements ActionListener {
                 client.setUsername(username);
                 client.setAddress(address);
                 client.setPort(Integer.parseInt(port));
-                System.out.println("working");
                 this.dispose();
+                client.establishConnection(address, Integer.parseInt(port));
 
-                client.establishConnection();
             } else {
                 JOptionPane.showMessageDialog(this, "No");
             }

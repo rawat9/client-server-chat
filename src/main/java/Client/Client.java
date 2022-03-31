@@ -1,6 +1,11 @@
 package Client;
 
+import java.io.*;
+import java.net.ConnectException;
+import java.net.Socket;
+import java.net.UnknownHostException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 
 public class Client {
@@ -13,7 +18,6 @@ public class Client {
      private ConnectionController connectWindow;
 
      public Client() {
-          // Instantiate GUI for connection and open it
           openConnectionGUI();
      }
 
@@ -27,21 +31,24 @@ public class Client {
           window.open();
      }
 
-     public void establishConnection() {
-         communicationHandler = new CommunicationHandler(this);
+     public void establishConnection(String address, int port) {
+          communicationHandler = new CommunicationHandler(address, port, this);
      }
 
-     public void setCoordinator() {
-
-     }
-
-     public void isCoordinator() {
-
+     /**
+      * Updates the messages on Chat Window GUI
+      * @param message
+      */
+     public void updateMessage(Message message) {
+          String msg = message.getContent();
+          String text = "[" + message.getTimestamp() + "] " + " " + msg + "\n";
+          window.getServer().append(text);
      }
 
      public void sendMessage(String message, String receiverID) {
           Message newMessage = new Message(this.ID, message, receiverID);
           communicationHandler.sendMessage(newMessage);
+          window.getMessage().setText("");
      }
 
      public void setAddress(String address) {
@@ -75,6 +82,7 @@ public class Client {
      public void setPort(int port) {
           this.port = port;
      }
+
 
      public static void main(String[] args) {
           Client c = new Client();

@@ -3,9 +3,7 @@ package Client;
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
+import java.awt.event.*;
 import java.util.Arrays;
 
 
@@ -25,6 +23,7 @@ public class ClientController extends JFrame {
     private JButton leave;
     private JButton users;
     private Client client;
+    private String receiver = "Everyone";
 
     public ClientController(Client client) {
         this.client = client;
@@ -81,13 +80,26 @@ public class ClientController extends JFrame {
 
         // Combobox
         toWho = new JComboBox<>();
-        toWho.setSelectedItem("Everyone");
         toWho.addItem("Everyone");
+        toWho.setSelectedItem("Everyone");
         toWho.setBounds(60, 5, 120, 20);
+        toWho.addItemListener(e -> {
+            if (e.getStateChange() == ItemEvent.SELECTED)  {
+                receiver = String.valueOf(toWho.getSelectedItem());
+            }
+        });
 
         // Message Field
         message = new JTextField(30); // accepts upto 10 characters
         message.setBounds(5, 35, 280, 30);
+        message.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                    client.sendMessage(message.getText(), receiver);
+                }
+            }
+        });
 
         // Send Button
         send = new JButton("Send");
@@ -104,21 +116,10 @@ public class ClientController extends JFrame {
         panel.add(to);
         panel.add(toWho);
 
-        // Test Purposes
-        DefaultListModel<String> list = new DefaultListModel<>();
-        list.addElement("Pedro (Coordinator)");
-        list.addElement("Oskar");
-        list.addElement("Peter");
-        list.addElement("James");
-
-        members = new JList<>(list);
-        members.setBounds(365, 0, 135, 380);
-
         add(topbar);
         add(scrollBar);
         add(panel);
 
-        // Source object adds listener
         setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
         setBackground(Color.WHITE);
         setLocation(300,100);
@@ -160,5 +161,8 @@ public class ClientController extends JFrame {
 
     public JTextArea getServer() {
         return server;
+    }
+    public JTextField getMessage() {
+        return message;
     }
 }

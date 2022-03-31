@@ -8,12 +8,16 @@ import java.net.Socket;
 import java.util.ArrayList;
 
 public class CommunicationHandler extends Thread {
+    private String address;
+    private int port;
     private ObjectInputStream inputStream;
     private ObjectOutputStream outputStream;
     private Socket socket;
     private final Client client;
 
-    CommunicationHandler(Client client) {
+    CommunicationHandler(String address, int port, Client client) {
+        this.address = address;
+        this.port = port;
         super.start();
         this.client = client;
     }
@@ -21,7 +25,9 @@ public class CommunicationHandler extends Thread {
     @Override
     public void run() {
         try {
-            socket = new Socket("127.0.0.1", 8000);
+            String address = this.address;
+            int port = this.port;
+            socket = new Socket(address, port);
 
             outputStream = new ObjectOutputStream(socket.getOutputStream());
             inputStream = new ObjectInputStream(socket.getInputStream());
@@ -47,6 +53,10 @@ public class CommunicationHandler extends Thread {
                         System.out.println("user: " + user.getUsername());
                     }
                     // TODO: update list of users in the gui
+                } else if (header.equals(Headers.MESSAGE.toString())) {
+                    Message message;
+                    message = (Message) inputStream.readObject();
+                    client.updateMessage(message);
                 }
             }
         } catch (Exception e) {
