@@ -35,25 +35,18 @@ public class CommunicationHandler extends Thread {
             System.out.println("Waiting for the header");
             while (true) {
                 String header = inputStream.readUTF();
-                System.out.println("Header: " + header);
-                // TODO: React to header accordingly
                 if (header.equals(Headers.CLIENT_INFO_AWAITING.toString())) {
                     this.sendHeader(Headers.CLIENT_INFO_SENDING);
 
                     String clientInfo = client.getID() + ":" + client.getUsername();
                     outputStream.writeUTF(clientInfo);
                     outputStream.flush();
-
                 } else if (header.equals(Headers.CLIENT_INFO_VALID.toString())) {
                     // If client info is valid then open chat gui
                     client.openChatGUI();
                 } else if (header.equals(Headers.USERS_LIST.toString())) {
                     ArrayList<User> users = (ArrayList<User>) inputStream.readObject();
                     client.setActiveUsersList(users);
-                    for (User user : users) {
-                        System.out.println("user: " + user.getUsername());
-                    }
-                    // TODO: update list of users in the gui
                 } else if (header.equals(Headers.MESSAGE.toString())) {
                     Message message;
                     message = (Message) inputStream.readObject();

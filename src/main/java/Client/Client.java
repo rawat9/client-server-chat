@@ -1,15 +1,9 @@
 package Client;
 
 import Server.User;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.io.*;
-import java.net.ConnectException;
-import java.net.Socket;
-import java.net.UnknownHostException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-
 
 public class Client {
      private String ID;
@@ -44,7 +38,7 @@ public class Client {
       * Updates the messages on Chat Window GUI
       * @param message
       */
-     public void updateMessage(Message message) {
+     public void updateMessage(@NotNull Message message) {
           String msg = message.getContent();
           String text = "[" + message.getTimestamp() + "] " + " " + msg + "\n";
           window.getServer().append(text);
