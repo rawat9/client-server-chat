@@ -109,8 +109,6 @@ public class ConnectionController extends JFrame implements ActionListener {
 
             /* TODO: Validations */
             if (port.equalsIgnoreCase("8000") && address.equalsIgnoreCase("127.0.0.1")) {
-                JOptionPane.showMessageDialog(this, "You are the coordinator");
-
                 client.setID(id);
                 client.setUsername(username);
                 client.setAddress(address);

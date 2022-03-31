@@ -4,6 +4,7 @@ import Server.User;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class Client {
      private String ID;
@@ -40,7 +41,14 @@ public class Client {
       */
      public void updateMessage(@NotNull Message message) {
           String msg = message.getContent();
-          String text = "[" + message.getTimestamp() + "] " + " " + msg + "\n";
+          String senderUsername = "";
+          for (User user : activeUsersList) {
+               if (Objects.equals(user.getID(), message.getSenderID())) {
+                    senderUsername = user.getUsername();
+               }
+          }
+
+          String text = "[" + message.getTimestamp() + "] " + senderUsername + ": " + msg + "\n";
           window.getServer().append(text);
      }
 
@@ -84,11 +92,15 @@ public class Client {
 
      public void setActiveUsersList(ArrayList<User> activeUsersList) {
           this.activeUsersList = activeUsersList;
-          window.updateUsersList();
+          window.updateUsersList(activeUsersList);
      }
 
      public ArrayList<User> getActiveUsersList() {
           return this.activeUsersList;
+     }
+
+     public void showCoordinatorInfo() {
+          window.showCoordinatorDialog();
      }
 
      public static void main(String[] args) {
