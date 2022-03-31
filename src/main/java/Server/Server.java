@@ -41,7 +41,6 @@ public class Server {
     }
 
     public static void main(String[] args) {
-        System.out.println("Initializing the server");
         Server server = new Server();
         server.startServer();
     }

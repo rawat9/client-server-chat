@@ -26,11 +26,9 @@ class ConnectionHandler extends Thread {
             // Firstly initiate connection - get info about user
             this.initiateConnection();
 
-            System.out.println("Connection initiated");
             // Receive any message
             while (!this.isInterrupted()) {
                 String header = in.readUTF();
-                System.out.println("HEADER_RECEIVED: " + header);
 
                 if (header.equals(Headers.MESSAGE.toString())) {
                     Message message = (Message) in.readObject();
@@ -43,7 +41,6 @@ class ConnectionHandler extends Thread {
             // In case of exception remove user from members map
             // This indicates that user disconnected
             sharedState.removeMember(this.getId());
-            System.out.println("User Disconnected");
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
@@ -60,7 +57,6 @@ class ConnectionHandler extends Thread {
         while (true) {
             // Accept line from the connection
             String header = in.readUTF();
-            System.out.println("HEADER_RECEIVED: " + header);
 
             // If user sends CLIENT_INFO header
             // Read line of code containing unique id, ip address, name of the user
@@ -71,7 +67,6 @@ class ConnectionHandler extends Thread {
                     // If client data are valid, send header informing about that
                     this.sendHeader(Headers.CLIENT_INFO_VALID);
                     sharedState.addMember(clientInfo, this.getId(), socket.getInetAddress().toString());
-                    System.out.println("member added");
                     return;
                 } else {
                     this.sendHeader(Headers.CLIENT_INFO_INVALID);
