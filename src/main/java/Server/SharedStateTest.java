@@ -87,7 +87,7 @@ class SharedStateTest {
         sharedState.addMember("124ab:pedro", thread2, ipAddress);
 
         Message message = new Message("123ab", "Message", "124ab");
-        sharedState.addMessage(message, (long) thread1);
+        sharedState.addMessage(message);
 
         List<Message> messages = sharedState.getMessages();
         assertEquals(1, messages.size());

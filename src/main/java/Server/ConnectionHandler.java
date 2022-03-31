@@ -34,7 +34,7 @@ class ConnectionHandler extends Thread {
 
                 if (header.equals(Headers.MESSAGE.toString())) {
                     Message message = (Message) in.readObject();
-                    sharedState.addMessage(message, this.getId());
+                    sharedState.addMessage(message);
                 } else {
                     out.writeChars(Headers.INVALID_HEADER.toString());
                 }
@@ -92,9 +92,9 @@ class ConnectionHandler extends Thread {
         }
     }
 
-    public void sendMessage(@NotNull Headers messageHeader, Message message) {
+    public void sendMessage(Message message) {
         try {
-            this.sendHeader(messageHeader);
+            this.sendHeader(Headers.MESSAGE);
 
             out.writeObject(message);
             out.flush();
