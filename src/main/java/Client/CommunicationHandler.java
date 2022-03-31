@@ -43,10 +43,7 @@ public class CommunicationHandler extends Thread {
                     client.openChatGUI();
                 } else if (header.equals(Headers.USERS_LIST.toString())) {
                     ArrayList<User> users = (ArrayList<User>) inputStream.readObject();
-                    for (User user : users) {
-                        System.out.println("user: " + user.getUsername());
-                    }
-                    // TODO: update list of users in the gui
+                    client.setActiveUsersList(users);
                 }
             }
         } catch (Exception e) {
