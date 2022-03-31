@@ -85,6 +85,7 @@ public class SharedState {
 
         // Once the user is fully created, add him to the membersOrder list
         this.membersOrder.add(threadId);
+        System.out.println("User " + member.getUser().getUsername() + " joined the server");
 
         if (this.membersOrder.size() == 1) {
             this.sendCoordinatorInfo(threadId);
@@ -121,6 +122,7 @@ public class SharedState {
 
         // Remove member from members map
         this.membersMap.remove(threadId);
+        System.out.println("User " + member.getUser().getUsername() + " disconnected");
 
         // Send updated list of members
         this.updateMembers();
@@ -128,6 +130,7 @@ public class SharedState {
 
     public synchronized void sendCoordinatorInfo(Long threadId) {
         Member member = this.membersMap.get(threadId);
+        System.out.println("New coordinator: " + member.getUser().getUsername());
         // Set property isCoordinator to true
         member.getUser().setCoordinator();
         // Send message to the user that he is now the coordinator
