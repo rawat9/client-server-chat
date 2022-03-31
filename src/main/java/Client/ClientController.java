@@ -4,6 +4,7 @@ import Server.User;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -28,6 +29,7 @@ public class ClientController extends JFrame {
     private JList<String> members;
     private JButton leave;
     private JButton users;
+    private JTree usersTree;
     private Client client;
     private String receiver = "Everyone";
 
@@ -137,9 +139,25 @@ public class ClientController extends JFrame {
     }
 
     public JFrame usersPanel() {
-        ArrayList<User> usersList = client.getActiveUsersList();
+        updateUsersList(client.getActiveUsersList());
 
         JFrame frame = new JFrame();
+
+        JScrollPane scrollPane = new JScrollPane(usersTree);
+        frame.add(scrollPane);
+        frame.setSize(300,300);
+        frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
+        return frame;
+    }
+
+    public void updateUsersList(ArrayList<User> usersList) {
+        if (usersTree == null) {
+            usersTree = new JTree();
+        } else {
+            DefaultTreeModel model = (DefaultTreeModel) usersTree.getModel();
+            model.setRoot(null);
+        }
+
         DefaultMutableTreeNode usersNode = new DefaultMutableTreeNode("Users");
 
         for (User user : usersList) {
@@ -159,16 +177,11 @@ public class ClientController extends JFrame {
             usersNode.add(root);
         }
 
-        JTree usersTree = new JTree(usersNode);
-        JScrollPane scrollPane = new JScrollPane(usersTree);
-        frame.add(scrollPane);
-        frame.setSize(300,300);
-        frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
-        return frame;
+        usersTree = new JTree(usersNode);
     }
 
-    public void updateUsersList() {
-//        usersTree.
+    public void showCoordinatorDialog() {
+        JOptionPane.showMessageDialog(this, "You are the coordinator");
     }
 
     public JTextArea getServer() {

@@ -51,6 +51,8 @@ public class CommunicationHandler extends Thread {
                     Message message;
                     message = (Message) inputStream.readObject();
                     client.updateMessage(message);
+                } else if (header.equals(Headers.COORDINATOR_INFO.toString())) {
+                    client.showCoordinatorInfo();
                 }
             }
         } catch (Exception e) {
