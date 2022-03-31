@@ -1,6 +1,6 @@
 package Client;
 
-import Server.Server;
+import Server.User;
 
 import javax.swing.*;
 import java.awt.*;
@@ -28,7 +28,11 @@ public class ConnectionController extends JFrame implements ActionListener {
 
     JButton joinButton = new JButton("JOIN");
 
-    ConnectionController() {
+    private Client client;
+
+    ConnectionController(Client client) {
+        this.client = client;
+
         setTitle("Connection");
         setVisible(true);
         setBounds(10, 10, 370, 500);
@@ -101,7 +105,6 @@ public class ConnectionController extends JFrame implements ActionListener {
         idField.setBackground(Color.LIGHT_GRAY);
         idField.setEditable(false);
 
-        Server server = new Server();
         serverAddressField.setText("127.0.0.1");
         serverAddressField.setEditable(false);
         serverAddressField.setBackground(Color.LIGHT_GRAY);
@@ -125,7 +128,7 @@ public class ConnectionController extends JFrame implements ActionListener {
                 JOptionPane.showMessageDialog(this, "You are the coordinator");
                 System.out.println("working");
                 this.dispose();
-                SwingUtilities.invokeLater(() -> new ClientController().setVisible(true));
+                this.client.establishServerConnection(address, Integer.parseInt(port), id, username);
             } else {
                 JOptionPane.showMessageDialog(this, "No");
             }

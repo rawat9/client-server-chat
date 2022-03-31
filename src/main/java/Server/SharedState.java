@@ -56,6 +56,7 @@ public class SharedState {
 
     // It adds message to the list and broadcasts it to other users
     public synchronized void addMessage(Message messageContent, long senderId) {
+        System.out.println("Message received: " + messageContent.getContent());
         this.messages.add(messageContent);
 
         // Broadcast newly added message to every other member

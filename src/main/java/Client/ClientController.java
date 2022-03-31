@@ -3,15 +3,15 @@ package Client;
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
+import java.awt.event.*;
 import java.util.Arrays;
 
 
 public class ClientController extends JFrame implements ActionListener {
     private static final int WINDOW_WIDTH = 365;
     private static final int WINDOW_HEIGHT = 460;
+
+    private Client client;
 
     // UI components
     private JTextField message;
@@ -25,7 +25,9 @@ public class ClientController extends JFrame implements ActionListener {
     private JButton leave;
     private JButton users;
 
-    public ClientController() {
+    public ClientController(Client client) {
+        this.client = client;
+
         setLayout(null);
 
         // Topbar
@@ -78,6 +80,14 @@ public class ClientController extends JFrame implements ActionListener {
         // Message Field
         message = new JTextField(30); // accepts upto 10 characters
         message.setBounds(5, 35, 280, 30);
+        message.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                    client.sendMessage(message.getText(), "1234");
+                }
+            }
+        });
 
         // Send Button
         send = new JButton("Send");
@@ -154,9 +164,8 @@ public class ClientController extends JFrame implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        Client client = new Client();
-        if (!message.getText().equals("")) {
-            client.sendMessage(message.getText(), client.getID());
-        }
+//        if (!message.getText().equals("")) {
+//            client.sendMessage(message.getText(), "1234");
+//        }
     }
 }

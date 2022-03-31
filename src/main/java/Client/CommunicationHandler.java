@@ -8,14 +8,27 @@ import java.net.Socket;
 public class CommunicationHandler extends Thread {
     private ObjectInputStream inputStream;
     private ObjectOutputStream outputStream;
-    private ClientController controller;
+    private Client client;
     private Socket socket;
     private String header;
+    private String userId;
+    private String username;
+    private String ipAddress;
+    private int port;
+
+    CommunicationHandler(String ipAddress, int port, String userId, String username, Client client) {
+        this.ipAddress = ipAddress;
+//        this.port = port;
+        this.port = 6666;
+        this.userId = userId;
+        this.username = username;
+        this.client = client;
+    }
 
     @Override
     public void run() {
         try {
-            socket = new Socket("127.0.0.1", 6666);
+            socket = new Socket(ipAddress, port);
 
             outputStream = new ObjectOutputStream(socket.getOutputStream());
             inputStream = new ObjectInputStream(socket.getInputStream());
@@ -28,7 +41,11 @@ public class CommunicationHandler extends Thread {
                 if (header.equals(Headers.CLIENT_INFO_AWAITING.toString())) {
                     outputStream.writeUTF(Headers.CLIENT_INFO_SENDING.toString());
                     outputStream.flush();
-                    System.out.println("Działą!!");
+
+                    outputStream.writeUTF(this.userId+":"+this.username);
+                    outputStream.flush();
+                } else if (header.equals(Headers.CLIENT_INFO_VALID.toString())) {
+                    this.client.openChatWindow();
                 }
             }
         } catch (Exception e) {
@@ -38,6 +55,7 @@ public class CommunicationHandler extends Thread {
 
     public void sendMessage(Message message) {
         try {
+            System.out.println("sending a message");
             // Firstly send header
             outputStream.writeUTF(Headers.MESSAGE.toString());
             outputStream.flush();
