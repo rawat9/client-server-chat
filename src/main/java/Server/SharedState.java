@@ -28,13 +28,10 @@ public class SharedState {
         return clientInfo.split(":");
     }
 
-    // It broadcasts message to every member from the list apart from the sender
-    private void broadcastMessage(Message messageContent, long senderId) {
+    private void broadcastMessage(Message messageContent) {
         for (Member member : this.membersMap.values()) {
             ConnectionHandler connection = member.getConnection();
-            if (connection.getId() != senderId) {
-                connection.sendMessage(Headers.MESSAGE, messageContent);
-            }
+            connection.sendMessage(messageContent);
         }
     }
 
@@ -55,12 +52,20 @@ public class SharedState {
     }
 
     // It adds message to the list and broadcasts it to other users
-    public synchronized void addMessage(Message messageContent, long senderThreadId) {
-        System.out.println("Message received: " + messageContent.getContent());
+    public synchronized void addMessage(Message messageContent) {
         this.messages.add(messageContent);
 
-        // Broadcast newly added message to every other member
-        this.broadcastMessage(messageContent, senderThreadId);
+        if (Objects.equals(messageContent.getReceiverID(), "Everyone")) {
+            // Broadcast newly added message to every other member
+            this.broadcastMessage(messageContent);
+        } else {
+            for (Member member : membersMap.values()) {
+                User user = member.getUser();
+                if (Objects.equals(user.getID(), messageContent.getReceiverID())) {
+                    member.getConnection().sendMessage(messageContent);
+                }
+            }
+        }
     }
 
     public void initiateMember(ConnectionHandler newConnection) {
