@@ -173,11 +173,11 @@ public class ClientController extends JFrame {
                 DefaultMutableTreeNode isCoordinator = new DefaultMutableTreeNode("Coordinator");
                 root.add(isCoordinator);
             }
-
             usersNode.add(root);
         }
 
-        usersTree = new JTree(usersNode);
+        DefaultTreeModel model = (DefaultTreeModel) usersTree.getModel();
+        model.setRoot(usersNode);
     }
 
     public void showCoordinatorDialog() {
