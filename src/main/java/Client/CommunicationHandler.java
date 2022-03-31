@@ -1,18 +1,17 @@
 package Client;
 
 import Server.Headers;
+import Server.User;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.ArrayList;
 
 public class CommunicationHandler extends Thread {
     private ObjectInputStream inputStream;
     private ObjectOutputStream outputStream;
-    private ClientController controller;
     private Socket socket;
-    private String header;
-    private Client client;
-    private Boolean isConnected = false;
+    private final Client client;
 
     CommunicationHandler(Client client) {
         super.start();
@@ -26,22 +25,38 @@ public class CommunicationHandler extends Thread {
 
             outputStream = new ObjectOutputStream(socket.getOutputStream());
             inputStream = new ObjectInputStream(socket.getInputStream());
-            isConnected = true;
 
             System.out.println("Waiting for the header");
             while (true) {
-                header = inputStream.readUTF();
+                String header = inputStream.readUTF();
                 System.out.println("Header: " + header);
                 // TODO: React to header accordingly
                 if (header.equals(Headers.CLIENT_INFO_AWAITING.toString())) {
-                    outputStream.writeUTF(Headers.CLIENT_INFO_SENDING.toString());
+                    this.sendHeader(Headers.CLIENT_INFO_SENDING);
+
+                    String clientInfo = client.getID() + ":" + client.getUsername();
+                    outputStream.writeUTF(clientInfo);
                     outputStream.flush();
-                    System.out.println("!!");
+
+                } else if (header.equals(Headers.CLIENT_INFO_VALID.toString())) {
+                    // If client info is valid then open chat gui
+                    client.openChatGUI();
+                } else if (header.equals(Headers.USERS_LIST.toString())) {
+                    ArrayList<User> users = (ArrayList<User>) inputStream.readObject();
+                    for (User user : users) {
+                        System.out.println("user: " + user.getUsername());
+                    }
+                    // TODO: update list of users in the gui
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void sendHeader(Headers header) throws IOException {
+        outputStream.writeUTF(header.toString());
+        outputStream.flush();
     }
 
     public void sendMessage(Message message) {
@@ -67,12 +82,4 @@ public class CommunicationHandler extends Thread {
                e.printStackTrace();
           }
      }
-
-    public Boolean getConnected() {
-        return isConnected;
-    }
-
-    public void setConnected(Boolean connected) {
-        isConnected = connected;
-    }
 }

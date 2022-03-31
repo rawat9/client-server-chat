@@ -125,7 +125,7 @@ public class ConnectionController extends JFrame implements ActionListener {
                 System.out.println("working");
                 this.dispose();
 
-                client.openChat();
+                client.establishConnection();
             } else {
                 JOptionPane.showMessageDialog(this, "No");
             }
