@@ -94,8 +94,6 @@ public class ConnectionController extends JFrame implements ActionListener {
         idField.setText(id);
         idField.setBackground(Color.LIGHT_GRAY);
         idField.setEditable(false);
-
-        Server server = new Server();
     }
 
     @Override

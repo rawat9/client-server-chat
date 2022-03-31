@@ -7,15 +7,9 @@ package Server;
 public class Server {
     // Main server thread
     private Thread mainServerThread;
-    // ip address of the server
-    private String ipAddress;
-    // port of the server
-    private int port;
 
-    public Server() {
+    public Server(int port) {
         // Initialize necessary values
-        this.port = 8000;
-        this.ipAddress = "127.0.0.1";
         this.mainServerThread = new MainServerThread(port);
     }
 
@@ -41,7 +35,7 @@ public class Server {
     }
 
     public static void main(String[] args) {
-        Server server = new Server();
+        Server server = new Server(Integer.parseInt(args[0]));
         server.startServer();
     }
 }
