@@ -12,7 +12,7 @@ public class User implements Serializable {
         this.ID = ID;
         this.username = username;
         this.ipAddress = ipAddress;
-        isCoordinator = false;
+        this.isCoordinator = false;
     }
 
     public String getID() {
@@ -24,7 +24,7 @@ public class User implements Serializable {
     }
 
     public void setCoordinator() {
-       isCoordinator = true;
+        this.isCoordinator = true;
     }
 
     public boolean getIsCoordinator() {

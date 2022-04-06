@@ -148,6 +148,7 @@ public class ClientController extends JFrame {
             DefaultMutableTreeNode ipAddress = new DefaultMutableTreeNode("ip_address: " + user.getIpAddress());
             root.add(ipAddress);
 
+            System.out.println(user.getUsername() + " : " + user.getIsCoordinator());
             if (user.getIsCoordinator()) {
                 DefaultMutableTreeNode isCoordinator = new DefaultMutableTreeNode("Coordinator");
                 root.add(isCoordinator);
