@@ -105,17 +105,12 @@ public class ConnectionController extends JFrame implements ActionListener {
             String address = serverAddressField.getText();
             String port = serverPortField.getText();
 
-            /* TODO: Validations */
-            if (port.equalsIgnoreCase("8000") && address.equalsIgnoreCase("127.0.0.1")) {
-                client.setID(id);
-                client.setUsername(username);
-                client.setAddress(address);
-                client.setPort(Integer.parseInt(port));
-                this.dispose();
-                client.establishConnection(address, Integer.parseInt(port));
-            } else {
-                JOptionPane.showMessageDialog(this, "No");
-            }
+            client.setID(id);
+            client.setUsername(username);
+            client.setAddress(address);
+            client.setPort(Integer.parseInt(port));
+            this.dispose();
+            client.establishConnection(address, Integer.parseInt(port));
         }
     }
 }
